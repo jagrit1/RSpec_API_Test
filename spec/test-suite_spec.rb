@@ -95,7 +95,51 @@ describe "Test Suite sends a put request" do
   end
 end
 
+describe "Test Suite sends a patch request" do
+  it "should update a single todo from an ID" do
+    q= HTTParty.post "http://lacedeamon.spartaglobal.com/todos", query:{title: "A new Item", due: "2014-10-01"}
+    r= HTTParty.patch "http://lacedeamon.spartaglobal.com/todos/#{q['id']}", query:{title: "A patched new Item1"}
+    #verify
+    expect(r["title"]).to eq("A patched new Item1")
+    expect(r['due']).to eq("2014-10-01")
+    expect(r.message).to eq("OK")
+    expect(r.code).to eq(200)
 
+    #teardown
+    HTTParty.delete "http://lacedeamon.spartaglobal.com/todos/#{q['id']}"
+      
+end
+it "sould not make a patched update to the whole collection" do
+      r= HTTParty.patch "http://lacedeamon.spartaglobal.com/todos"
+      #verify
+      expect(r.code).to eq(405)
+      expect(r.message).to eq("Method Not Allowed")
+  end
+
+end
+
+describe "Test Suite sends a delete request" do
+    #execute
+
+    it "should delete a single todo from an ID" do
+    q= HTTParty.post "http://lacedeamon.spartaglobal.com/todos", query:{title: "Jagrit's item", due: "2014-10-01"}
+    r= HTTParty.delete "http://lacedeamon.spartaglobal.com/todos/#{q['id']}"
+    #verify
+    expect(r["title"]).to eq nil
+    expect(r['due']).to eq nil
+    expect(r.message).to eq("No Content")
+    expect(r.code).to eq(204)
+  end
+
+  it "should not delete a todo collection from an ID" do
+    r= HTTParty.delete "http://lacedeamon.spartaglobal.com/todos"
+    #verify
+    expect(r["title"]).to eq nil
+    expect(r['due']).to eq nil
+    expect(r.message).to eq("Method Not Allowed")
+    expect(r.code).to eq(405)
+  end
+end
 
 
 
